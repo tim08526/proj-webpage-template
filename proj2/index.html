@@ -352,10 +352,10 @@
         </p>
         <p>
             In order to iterate through the edges and vertices, the EdgeIter or VertexIter and their associated begin and end Iters were
-            used to loop through. An initial bug was that new edges added by edge splits were being iterated over creating an infinite loop.
+            used to loop through. An initial bug was that new edges added by edge splits were being iterated over, thus creating an infinite loop.
             This was noted and debugged by printing the new positions of newly added edges and noting that they were 0. This added an
             implementation quirk of not iterating until the end EdgeIter, but instead iterating over the size of the initial edge list,
-            so that only the original edges were considered. The initial fix of setting isNew to true for the half of an edge created by a split
+            so that only the original edges were considered. The initial fix of setting <b>isNew<\b> to true for the half of an edge created by a split
             resulted in additional errors, where the incorrect edges were being flipped. This was debugged by entering the meshedit tool
             and flipping back some of the edges and noticing that this fixed the mesh.
         </p>
@@ -408,10 +408,10 @@
             For the initial cube, there is asymmetry in the later subdivisions, as the original cube is not symmetric, i.e the triangles are
             not equilateral, and the length of edges between faces varies widely, so edge splits and flips result in new triangles that are also not symmetric.
 
-            Pre-processing with edge flips and splits can make it so that the cube is divided more symmetrically. By making the the original mesh
-            contain triangles with more even side lengths, edge splits will no longer unevenly split existing triangles. Pre-processing alleviates these asymmetric
-            effects, since splittong on more even triangles the same size results in similar triangles. Additionally, there will be fewer splits,
-            where edges of must larger sizes are created. 
+            Pre-processing with edge flips and splits can make it so that the cube is divided more symmetrically. By making the original mesh
+            contain triangles with equilateral-like side lengths, edge splits will no longer unevenly split existing triangles. Pre-processing alleviates these asymmetric
+            effects, since splitting on equilateral-like triangles of the same size results in similar triangles. Additionally, there will be fewer splits,
+            where edges of much larger sizes are created, i.e there are short and long edges in the same mesh. 
 
 
 
