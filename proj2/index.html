@@ -238,7 +238,7 @@
         </b>
         <p>
             Debugging involved manually checking address locations after each update. Many print statements were used on each address to check
-            the the modification to the mesh was modifying the correct object. 
+            that the modification to the mesh was modifying the correct object. 
         </p>
         <br />
 
@@ -344,19 +344,20 @@
             the <b>newPosition</b> was stored in the edges that were to be split. This was calculated as the sum <b>3/8 * og_position</b> for
             connecting vertices to the edge and <b>1/8 * og_position</b> for the other vertices sharing a face of the edge, but not adjacent
             to the edge.
-
+        </p>
+        <p>
             After determining the new positions, each edge in the mesh was split, setting the new position of the created vertex
             to the previously calculated new position in the split edge. Each new edge created in the edge split was then flipped
             if it connected a new and old vertex. The positions of vertices were then updated using the previously calculated new positions.
-
+        </p>
+        <p>
             In order to iterate through the edges and vertices, the EdgeIter or VertexIter and their associated begin and end Iters were
             used to loop through. An initial bug was that new edges added by edge splits were being iterated over creating an infinite loop.
             This was noted and debugged by printing the new positions of newly added edges and noting that they were 0. This added an
-            implementation of quirk of not iterating until the end EdgeIter, but instead iterating over the size of the initial edge list,
-            so that only the original edges were considered. The initial fix of setting half of an edge created by a split to new
+            implementation quirk of not iterating until the end EdgeIter, but instead iterating over the size of the initial edge list,
+            so that only the original edges were considered. The initial fix of setting isNew to true for the half of an edge created by a split
             resulted in additional errors, where the incorrect edges were being flipped. This was debugged by entering the meshedit tool
             and flipping back some of the edges and noticing that this fixed the mesh.
-
         </p>
         <br />
 
