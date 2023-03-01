@@ -1,7 +1,485 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    background-color: white;
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  kbd {
+    color: #121212;
+  }
+</style>
+<title>CS 184 Mesh Edit</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">Project 2: Mesh Edit</h1>
+<h2 align="middle">Chun Deng, Timothy Tu</h2>
+
+<br><br>
+
+    <div>
+
+<h2 align="middle">Overview</h2>
+<p>
+    We implemented belzier curves and surfaces, as well as mesh operations like flip, split, and subdivide.
+</p>
+<br>
+
+
+        <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+        <h3 align="middle">Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
+
+
+<b>
+  Briefly explain de Casteljau's algorithm and how you implemented it in order to evaluate Bezier curves.
+</b>
+<p>
+  de Casteljau's algorithm uses linear interpolation recursively to evaluate belzier curves where the evaluation of the cubic belzier curve at point t is described as recursively linear inpolating all the control points, and at each step use the output from the previous step as control points to linearly interpolate for the next step. This follows the convex hull property, which by recursively subdividing we approximate the actual curve, except that, instead of at the midpoint for subdivision, we define at a particular t which we wish to split the belzier curve. Mathematically, this recursive property works due to the Bernstein form of belzier curves. I implemented this portion according to lecture, where I kept an array of control points, and for each evaluate step do a for loop over the control points, lerping i and i+1 control point to push to another array, and returning that result.
+</p>
+<br>
+
+
+<b>
+  Take a look at the provided .bzc files and create your own Bezier curve with 6 control points of your choosing. Use this Bezier curve for your screenshots below.
+</b>
+<p>
+    I created a belzier with these control points: 0.200 0.350   0.300 0.600   0.500 0.750   0.600 0.800   0.700 0.450  1.000 0.900
+</p>
+<!-- Example of including a single figure -->
+<div align="middle">
+  <img src="images/1.png" align="middle" width="50%">
+</div>
+<br>
+
+<b>
+  Show screenshots of each step / level of the evaluation from the original control points down to the final evaluated point. Press <kbd>E</kbd> to step through. Toggle <kbd>C</kbd> to show the completed Bezier curve as well.
+</b>
+<!-- Example of including multiple figures -->
+<div align="middle">
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="images/2.png" align="middle" width="400px"/>
+        <figcaption>Level 0</figcaption>
+      </td>
+      <td>
+        <img src="images/3.png" align="middle" width="400px"/>
+        <figcaption>Level 1</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr align="center">
+      <td>
+        <img src="images/4.png" align="middle" width="400px"/>
+        <figcaption>Level 2</figcaption>
+      </td>
+      <td>
+        <img src="images/5.png" align="middle" width="400px"/>
+        <figcaption>Level 3</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr align="center">
+      <td>
+        <img src="images/6.png" align="middle" width="400px"/>
+        <figcaption>Level 4</figcaption>
+      </td>
+      <td>
+        <img src="images/7.png" align="middle" width="400px"/>
+        <figcaption>Level 4 with final curve</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br>
+
+
+<b>
+  Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter \(t\) via mouse scrolling.
+</b>
+<div align="middle">
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="images/8.png" align="middle" width="400px"/>
+        <figcaption>New Curve.</figcaption>
+      </td>
+      <td>
+        <img src="images/9.png" align="middle" width="400px"/>
+        <figcaption>Scrolling and adjusting.</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr align="center">
+      <td>
+        <img src="images/10.png" align="middle" width="400px"/>
+        <figcaption>scrolling and adjusting.</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<br>
+<br>
+
+
+<h3 align="middle">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
+<b>
+  Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.
+</b>
+<p>
+  Belzier surfaces are constructed from a using the evaluation of individual belzier curves from one dimension, and treating them as control points in the second dimension. In other words, suppose you have a bunch of control points on a grid, and you have a (u, v) coordinate you like to evaluate the belzier surface. You first evaluate the belzier curves at position u from the perspective where u lies on the x axis, and then you take those results (which should be a list of points), and treat these points as control points to evaluate the belzier curve on v. I implemented this by filling out the functions for evaluate step and evaluate 1D, then looping through in the evaluate function and using the evaluate1D function to evaluate all the belzier curves corresponding to the u coordinate, then with those control points using another evaluate1D to evaluate the final position.
+</p>
+<br>
+
+
+<b>
+  Show a screenshot of bez/teapot.bez (not .dae) evaluated by your implementation.
+</b>
+<div align="middle">
+  <img src="images/11.png" align="middle" width="50%">
+</div>
+<br>
+
+
+        <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+        <h3 align="middle">Part 3: Area-Weighted Vertex Normals</h3>
+
+<b>
+  Briefly explain how you implemented the area-weighted vertex normals.
+</b>
+<p>
+  I implemented the area-weight vertex normals by traversing through each exident edge from the vertex, which can be done using the example loop described in halfEdgeMesh.h, and for each exident halfedge grab it's corresponding face. To get the area, you can take the cross product of two edges which constructs the face, and the resulting vector is the normal vector with a magnitude as the area of the parallelagram constructed from the two edges, half of which is the area of the triangle corresponding to these edges. We then take a sum of these normal vectors multiplied by the area on the face of these corresponding halfedges, and then at the end, normalize by turning the reuslting vector into the unit vector (length 1).
+</p>
+<br>
+
+
+<b>
+  Show screenshots of dae/teapot.dae (not .bez) comparing teapot shading with and without vertex normals. Use <kbd>Q</kbd> to toggle default flat shading and Phong shading.
+</b>
+<div align="middle">
+  <img src="images/11.png" align="middle" width="50%">
+</div>
+<br>
+<div align="middle">
+  <img src="images/12.png" align="middle" width="50%">
+</div>
+<br>
+<p>
+  Without the vertex normals (no phong shading), the color across the triangle is constant, leading to a very jagged transition between neighboring faces. With phong shading and vertex normals, we can now calculate the colors using the surface normal and reflection model, leading to a smoothed out look of the teapot. With Phong shading, we now have information to calculate the behavior under a reflection model from the irradience of the surface of the mesh.
+</p>
+
+
+        <h3 align="middle">Part 4: Edge Flip</h3>
+        <b>
+            Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used.
+        </b>
+        <p>
+            The edge flip operation was implemented by first labelling all of the involved objects with variables, so that changing relationships 
+            between objects did not modify later accesses. After this was done, the neighbors for all halfedges were set, followed by vertices and then
+            edges. 
+        </p>
+        <br />
+
+
+        <b>
+            Show screenshots of the teapot before and after some edge flips.
+        </b>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                    <tr align="center">
+                        <td>
+                            <img src="images/teapot.png" align="middle" width="400px" />
+                            <figcaption>No edge flips</figcaption>
+                        </td>
+                        <td>
+                            <img src="images/teapot_flip.png" align="middle" width="400px" />
+                            <figcaption>Edge Flips</figcaption>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </p>
+        <br />
+
+
+        <b>
+            Write about your eventful debugging journey, if you have experienced one.
+        </b>
+        <p>
+            Debugging involved manually checking address locations after each update. Many print statements were used on each address to check
+            the the modification to the mesh was modifying the correct object. 
+        </p>
+        <br />
+
+
+        <h3 align="middle">Part 5: Edge Split</h3>
+        <b>
+            Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used.
+        </b>
+        <p>
+            Initially, all relevant objects in the mesh were defined and given variables, so that neighbor setting did not
+            modify how these objects were accessed. The edge split operation was implemented by creating 6 new objects in the mesh:
+            3 new edges, 2 new faces, and 1 new vertex. After creating these new objects, the relationships between these objects and 
+            the existing objects in the mesh were added. Halfedges, vertices, and then edges were modified to reflect these relationships.
+            Additionally, the newly created vertex and edges were labelled as new, so that loop subdivision could take advantage of this. 
+            However, the other half of the existing edge was still labelled as not new for loop subdivision. 
+        </p>
+        <br />
+
+
+        <b>
+            Show screenshots of a mesh before and after some edge splits.
+        </b>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                    <tr align="center">
+                        <td>
+                            <img src="images/teapot.png" align="middle" width="400px" />
+                            <figcaption>No edge flips or splits</figcaption>
+                        </td>
+                        <td>
+                            <img src="images/teapot_split.png" align="middle" width="400px" />
+                            <figcaption>Edge split</figcaption>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr align="center">
+                        <td>
+                            <img src="images/teapot_split2.png" align="middle" width="400px" />
+                            <figcaption>More edge splits</figcaption>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+        </p>
+        <br />
+
+
+        <b>
+            Show screenshots of a mesh before and after a combination of both edge splits and edge flips.
+        </b>
+        <p>
+            <div align="middle">
+                <table style="width:100%">
+                    <tr align="center">
+                        <td>
+                            <img src="images/teapot.png" align="middle" width="400px" />
+                            <figcaption>No edge flips or splits</figcaption>
+                        </td>
+                        <td>
+                            <img src="images/teapot_split.png" align="middle" width="400px" />
+                            <figcaption>Edge split</figcaption>
+                        </td>
+                    </tr>
+                    <br />
+                    <tr align="center">
+                        <td>
+                            <img src="images/teapot_split_flip.png" align="middle" width="400px" />
+                            <figcaption>Edge splits and flips</figcaption>
+                        </td>
+                    </tr>
+                    <br />
+                </table>
+            </div>
+        </p>
+        <br />
+
+
+        <b>
+            Write about your eventful debugging journey, if you have experienced one.
+        </b>
+        <p>
+            Similar to the previous question, debugging involved manually checking address locations after each update and using print statements.
+            For this question, after a good deal of debugging, we realized that one of the half edges
+            was the incorrect half edge, i.e the twin instead of the half edge. This was due to a typo.
+        </p>
+        <br />
+
+
+        <br />
+
+
+        <h3 align="middle">Part 6: Loop Subdivision for Mesh Upsampling</h3>
+        <b>
+            Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used.
+        </b>
+        <p>
+            In order to implement loop subdivision, we first calculated the new position of original and new vertices within the mesh,
+            following the equations given. For original vertices it was the sum of <b>u * og_position</b> for each surrounding vertex, where <b>u</b>
+            is <b>3 / degree(v)</b> when the <b>degree(v)</b> is greater than 3, otherwise <b>3/16</b>. The vertex's initial position was also factored
+            as <b>(1 - n * u) * og_position</b>. This value was stored in the <b>newPosition</b> of existing vertices. For newly created vertices,
+            the <b>newPosition</b> was stored in the edges that were to be split. This was calculated as the sum <b>3/8 * og_position</b> for
+            connecting vertices to the edge and <b>1/8 * og_position</b> for the other vertices sharing a face of the edge, but not adjacent
+            to the edge.
+
+            After determining the new positions, each edge in the mesh was split, setting the new position of the created vertex
+            to the previously calculated new position in the split edge. Each new edge created in the edge split was then flipped
+            if it connected a new and old vertex. The positions of vertices were then updated using the previously calculated new positions.
+
+            In order to iterate through the edges and vertices, the EdgeIter or VertexIter and their associated begin and end Iters were
+            used to loop through. An initial bug was that new edges added by edge splits were being iterated over creating an infinite loop.
+            This was noted and debugged by printing the new positions of newly added edges and noting that they were 0. This added an
+            implementation of quirk of not iterating until the end EdgeIter, but instead iterating over the size of the initial edge list,
+            so that only the original edges were considered. The initial fix of setting half of an edge created by a split to new
+            resulted in additional errors, where the incorrect edges were being flipped. This was debugged by entering the meshedit tool
+            and flipping back some of the edges and noticing that this fixed the mesh.
+
+        </p>
+        <br />
+
+
+        <b>
+            Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges?
+        </b>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/torus.png" align="middle" width="400px" />
+                        <figcaption>No pre-processing. Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/torus_split.png" align="middle" width="400px" />
+                        <figcaption>No pre-processing. Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="images/torus_fix.png" align="middle" width="400px" />
+                        <figcaption>Pre-processing. Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/torus_fix_split.png" align="middle" width="400px" />
+                        <figcaption>Pre-processing Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+        <p>
+            After loop subdivision, sharp corners and edges become smoother. Additionally, the original position of a corner/edge is lost and 
+            the mesh is "tightened". For some very sharp edges, the mesh will wrap inward and still maintain the corner. Adding additional edge splits
+            and flips can disrupt this pattern. 
+
+        </p>
+        <br />
+
+
+        <b>
+            Load dae/cube.dae. Perform several iterations of loop subdivision on the cube. Notice that the cube becomes slightly asymmetric after repeated subdivisions.
+            Can you pre-process the cube with edge flips and splits so that the cube subdivides symmetrically? Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects.
+        </b>
+        <p>
+            For the initial cube, there is asymmetry in the later subdivisions, as the original cube is not symmetric, i.e the triangles are
+            not equilateral, and the length of edges between faces varies widely, so edge splits and flips result in new triangles that are also not symmetric.
+
+            Pre-processing with edge flips and splits can make it so that the cube is divided more symmetrically. By making the the original mesh
+            contain triangles with more even side lengths, edge splits will no longer unevenly split existing triangles. Pre-processing alleviates these asymmetric
+            effects, since splittong on more even triangles the same size results in similar triangles. Additionally, there will be fewer splits,
+            where edges of must larger sizes are created. 
+
+
+
+        </p>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/cube.png" align="middle" width="400px" />
+                        <figcaption>No pre-processing. Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/cube_split.png" align="middle" width="400px" />
+                        <figcaption>No pre-processing. Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="images/cube_fix.png" align="middle" width="400px" />
+                        <figcaption>Pre-processing. Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/cube_fix_split.png" align="middle" width="400px" />
+                        <figcaption>Pre-processing. Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="images/cube_fix_split2.png" align="middle" width="400px" />
+                        <figcaption>Pre-processing. Level 2</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+        <br />
+
+
+        <h3 align="middle">Part 7 (Optional, Possible Extra Credit)</h3>
+        <b>
+            Save your best polygon mesh as partsevenmodel.dae in your docs folder and show us a screenshot of the mesh in your write-up.
+        </b>
+        <p>
+            YOUR RESPONSE GOES HERE
+        </p>
+        <br />
+
+
+        <b>
+            Include a series of screenshots showing your original mesh and your mesh after one and two rounds of subdivision. If you have used custom shaders, include screenshots of your mesh with those shaders applied as well.
+        </b>
+        <p>
+            YOUR RESPONSE GOES HERE
+        </p>
+        <br />
+
+
+        <b>
+            Describe what you have done to enhance your mesh beyond the simple humanoid mesh described in the tutorial.
+        </b>
+        <p>
+            YOUR RESPONSE GOES HERE
+        </p>
+        <br />
+
+
+    </div></body>
 </html>
