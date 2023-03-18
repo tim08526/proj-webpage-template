@@ -69,12 +69,14 @@ Show images with normal shading for a few small .dae files. -->
     <b>x</b> and <b>y</b> to a point within <b>0.5 * tan(vFov)</b> and <b>0.5 * tan(hFov)</b>. This mapping 
     is just the linear interpolation between <b>-0.5 * tan(vFov)</b> and <b>0.5 * tan(vFov)</b> which define the
     sensor space endpoints. Once this ray has been calculated, it is transformed into world space using the <b>c2w</b> matrix. 
-
+  </p>
+  <p>
     For primitive intersection, random rays are generated within the bounding box of the pixel where 
     <b>x</b> and <b>y</b> are the bottom left corner of the pixel. For each ray, the radiance is estimated and 
     used as a singular sample in the overall monte carlo sampling for the pixel. To determine radiance, different
     intersection tests are used in order to find the radiance of a particular object in the image, where  
-
+  </p>
+  <p>
     Sphere intersection was similar in that the sphere ray equation was used to find intersection points, but the closest
     intersection point within bounds was used. These values were then also used to populate the intersection struct. 
 </p>
@@ -139,13 +141,15 @@ Compare rendering times on a few scenes with moderately complex geometries with 
     In the BVH construction, the initial primitives are partitioned into left and right nodes. This keep on repeating
     until the primitives within a node are less than the max leaf size at which point they are no longer split. Instead,
     the leaf node will iterate over these primitives on an intersection. 
-
+  </p>
+  <p>
     In the initial call, the bounding box of a node is defined by all the primitives passed into it, so the bounding box will
     expand to encompass all primitives it or it's children contain. The children are created by passing iterators of the partioned 
     list of primitives to a recursive call of the BHV construction. For our BVH construction, the start and end iterators of the
     node are only set when a leaf node is created, otherwise the start and end iterators are the same, so that there are no 
     primitives to iterate over. 
-    
+  </p>  
+  <p>
     When partioning the primitives, the axis with the longest distance
     between primitive centroids is chosen. The centroid along this axis is then the split point of the primitives. This heuristic roughly
     captures the idea of splitting the number of primitives in half each time, and so that smaller prisms will likely 
@@ -217,7 +221,8 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
     at that point, the BRDF is calculated which includes the probability of sampling that direction, the reflectance at that point
     given the incoming and outgoing directions, the intensity of the incoming light, as well as the angle of incoming light. Rather
     than integrating over the entire hemisphere, monte carlo integration is done, where many rays are sampled from within the hemisphere.
-
+<p>
+  </p>
     For importance sampling, a similar calculation with the BRDF is done. Therefore the probability of sampling that direction, the reflectance
     at that point given the incoming and outgoing directions, the intensity of the incoming light, as well as the angle of incoming light
     are all found. Except rather than sampling from within the uniform hemisphere, only the light sources are sampled. A ray is still
@@ -332,7 +337,8 @@ You will probably want to use the instructional machines for the above renders i
     For indirect lighting, the implementation is very similar to uniform hemisphere sampling. Except rather than determining the illuminance of a 
     surface by finding the bsdf emission, it's found by recursively calling the once bounce radiance function. Therefore, not just light sources can
     illuminate other surfaces, but surfaces that are being illuminated by other surfaces can illuminate other surfaces. 
-
+</p>
+ <p> 
     In addition to recursively calling the function, russian roulette is used to terminate the recursion along with a maximum recursion argument.
     Each recursive call corresponds to the bounce of a light ray, so a light ray cannot exceed this number of bounces. Each recursive call increases
     the total number of bounces the ray is tracking. Additionally, there is a chance on each bounce that the ray terminates, so instead of bouncing again
