@@ -197,7 +197,7 @@ Compare rendering times on a few scenes with moderately complex geometries with 
     logarithmic. Without using the bvh, the average time per primitive was approximately 1.4 ms. The algorithm should be approximately 
     logarithmic with respect to the number of primitives, making the estimated time for the cow 17.5 ms. This is not accurate though, indicating
     the overhead of traversing the bvh contributes to the rendering time. This is especially noticable and becomes the dominating factor 
-    when noticing that all the rendered images had similar with bvh rendering times. 
+    when noticing that all the rendered images had similar bvh rendering times. 
 </p>
 <br>
 
@@ -384,7 +384,7 @@ You will probably want to use the instructional machines for the above renders i
     The indirect light only is overall darker, but also contains the reflected light from the walls, i.e the blue and red tinges.
     This makes sense, as the indirect light contains the reflected light from the walls. Additionally, the overall light is darker
     because there are fewer rays being bounced due to the russian roulette. While the direct light only contains the white light from
-    the original light source. It is also the brightest as there is no decay due to repeated bounces, though there is the lambertian
+    the original light source. It is also the brightest as there is no decay due to repeated bounces, though the lambertian
     angle factor still included. 
 </p>
 <br>
@@ -425,7 +425,7 @@ You will probably want to use the instructional machines for the above renders i
 </div>
 <br>
 <p>
-    The effects of ray depths are most obvious in the 0, 1 and 2 case. In depth 0, only the light source is lit up and everything else is dark. In depth 1, we track light rays coming from the light source bouncing on an object, so anything in a direct path of the light source has some light on it, but other parts (such as the bottom of the bunny or top wall) have no lighting. In depth 2, there isn't an obvious restriction on which parts get light: almost the entire image has some form of light. This is because there is an indirect path to most locations in a scene. We can see that the top wall and the bottom of the bunny are lit up, although because of the lack of depth 1 ligth they are significantly darker than the other parts. Depth 3 and 100 aren't too noticeably different to our eyes, especially compared to the differences between 0 and 1 or 1 and 2. They do contain more red and purple hues from reflections off of the wall. The reason 3 and 100 are similar is because each level of depth is further discounted by the reflectivity of a surface, but this example illustrates that a few levels of depth can capture most of the detail in a scene (depending on the surface properties).   
+    The effects of ray depths are most obvious in the 0, 1 and 2 case. In depth 0, only the light source is lit up and everything else is dark. In depth 1, we track light rays coming from the light source bouncing on an object, so anything in a direct path of the light source has some light on it, but other parts (such as the bottom of the bunny or top wall) have no lighting. In depth 2, there isn't an obvious restriction on which parts get light: almost the entire image has some form of light. This is because there is an indirect path to most locations in a scene. We can see that the top wall and the bottom of the bunny are lit up, although because of the lack of depth 1 light they are significantly darker than the other parts. Depth 3 and 100 aren't too noticeably different to our eyes, especially compared to the differences between 0 and 1 or 1 and 2. They do contain more red and purple hues from reflections off of the wall. The reason 3 and 100 are similar is because each level of depth is further discounted by the reflectivity of a surface, but this example illustrates that a few levels of depth can capture most of the detail in a scene (depending on the surface properties).   
 </p>
 <br>
 
